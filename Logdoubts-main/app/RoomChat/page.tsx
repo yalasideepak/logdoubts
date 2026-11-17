@@ -3,16 +3,20 @@
 import { useRouter, useSearchParams } from "next/navigation"; 
 import { Chat } from "../../components/Chat";
 import { Spinner } from "../../components/Spinner";
-import { Suspense } from "react";
+import { Suspense, useEffect } from "react";
 import { useSession } from "next-auth/react";
 
 
 export default function RoomChat() {
-  const session = useSession();
-  if(!session.data?.user) {
-    const router = useRouter();
-    router.push("../Account")
-  }
+  const { data: session, status } = useSession();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      router.replace("/Account");
+    }
+  }, [status, router]);
+
   return (
     <Suspense fallback={<Spinner />}>
       <ChatWrapper />
